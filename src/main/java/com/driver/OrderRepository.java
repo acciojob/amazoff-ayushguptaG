@@ -14,7 +14,7 @@ public class OrderRepository {
     private HashMap<String, List<Order>> deliveryPartnerOrderMap= new HashMap<>();
     private List<Order> assignedOrders= new ArrayList<>();
 
-
+    private DeliveryPartner deliveryPartner;
     public void addOrder(Order order){
 
         String id= order.getId();
@@ -22,8 +22,8 @@ public class OrderRepository {
     }
     public void addPartner(String id){
 
-        DeliveryPartner deliveryPartner= new DeliveryPartner(id);
-        deliveryPartnerMap.put(id,deliveryPartner);
+         deliveryPartner= new DeliveryPartner(id);
+         deliveryPartnerMap.put(id,deliveryPartner);
     }
     public void addOrderPartnerPair(String orderId, String partnerId){
 
@@ -56,6 +56,9 @@ public class OrderRepository {
     }
     public List<String> getOrdersByPartnerId(String id){
 
+        if(!deliveryPartnerOrderMap.containsKey(id)){
+            return null;
+        }
         List<String> orderList= new ArrayList<>();
         for(Order order : deliveryPartnerOrderMap.get(id)){
             orderList.add(order.getId());
@@ -119,15 +122,25 @@ public class OrderRepository {
         return String.valueOf(time);
 
     }
-    public void  deletePartnerById(String id){
+    public void  deletePartnerById(String id) throws Exception {
 
-        for(Order order : deliveryPartnerOrderMap.get(id)){
+        if(!deliveryPartnerMap.containsKey(id)){
+            throw new Exception();
+        }
+
+        for (Order order : deliveryPartnerOrderMap.get(id)) {
 
             assignedOrders.remove(order);
         }
         deliveryPartnerOrderMap.remove(id);
+        deliveryPartnerMap.remove(id);
     }
-    public void  deleteOrderById(String orderId){
+
+    public void  deleteOrderById(String orderId) throws Exception{
+
+        if(!orderMap.containsKey(orderId)){
+            throw new Exception();
+        }
 
         if(assignedOrders.contains(orderMap.get(orderId))){
 
@@ -137,9 +150,6 @@ public class OrderRepository {
                 {
                     if(order.getId().equals(orderId))
                         deliveryPartnerOrderMap.get(partnerId).remove(order);
-
-                    if(deliveryPartnerOrderMap.get(partnerId).isEmpty())
-                        deliveryPartnerOrderMap.remove(partnerId);
                     break outer;
                 }
             }

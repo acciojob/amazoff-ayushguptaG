@@ -106,20 +106,30 @@ public class OrderController {
     }
 
     @DeleteMapping("/delete-partner-by-id/{partnerId}")
-    public ResponseEntity<String> deletePartnerById(@PathVariable String partnerId){
+    public ResponseEntity<String> deletePartnerById(@PathVariable String partnerId) throws Exception{
 
         //Delete the partnerId
         //And push all his assigned orders to unassigned orders.
-        orderService.deletePartnerById(partnerId);
+        try {
+            orderService.deletePartnerById(partnerId);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Partner doesn't exist", HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(partnerId + " removed successfully", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete-order-by-id/{orderId}")
-    public ResponseEntity<String> deleteOrderById(@PathVariable String orderId){
+    public ResponseEntity<String> deleteOrderById(@PathVariable String orderId) throws Exception{
 
         //Delete an order and also
         // remove it from the assigned order of that partnerId
-        orderService.deleteOrderById(orderId);
+        try {
+            orderService.deleteOrderById(orderId);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Order doesn't exist", HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(orderId + " removed successfully", HttpStatus.CREATED);
     }
 }
